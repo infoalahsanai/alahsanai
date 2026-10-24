@@ -159,7 +159,7 @@ export const Route = createFileRoute("/api/chat")({
         const lastText = String(parsed.data.messages[parsed.data.messages.length - 1]?.content ?? "");
         const isSiteReq = /ওয়েবসাইট|ওয়েব সাইট|website|landing|html|পেজ বানা|অ্যাপ বানা/i.test(lastText);
         const model = isSiteReq && /lite/i.test(baseModel)
-          ? (provider === "google" ? "gemini-3-flash-preview" : provider === "lovable" ? "google/gemini-3-flash-preview" : baseModel)
+          ? (provider === "google" ? "gemini-3-flash-preview" :  baseModel)
           : baseModel;
 
                   // API keys
