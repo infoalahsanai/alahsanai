@@ -162,16 +162,22 @@ export const Route = createFileRoute("/api/chat")({
           ? (provider === "google" ? "gemini-3-flash-preview" : provider === "lovable" ? "google/gemini-3-flash-preview" : baseModel)
           : baseModel;
 
-         // API keys
+                  // API keys
+        const poolList = (Array.isArray((keys as { key_pool?: unknown })?.key_pool) ? (keys as { key_pool: any[] }).key_pool : []);
+        const orFromPool = poolList.find((p) => p?.provider === "openrouter")?.key?.trim();
+        const openRouterKey = process.env["OPENROUTER_API_KEY"] || orFromPool || "";
+
         let url = "https://openrouter.ai/api/v1/chat/completions";
-        let key = process.env["OPENROUTER_API_KEY"] || keys?.openai_key?.trim();
-          if (provider === "google") {
+        let key = openRouterKey;
+        if (provider === "google") {
           url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
           key = keys?.google_key?.trim() || process.env["GOOGLE_API_KEY"];
-                } else if (provider === "openai") {
+        } else if (provider === "openai") {
           url = "https://api.groq.com/openai/v1/chat/completions";
           key = keys?.openai_key?.trim() || process.env["GROQ_API_KEY"] || process.env["OPENAI_API_KEY"];
         }
+        if (!key) return new Response("এই মোডের এপিআই কী সেট করা নেই। অ্যাডমিন প্যানেলে কী বসান।", { status: 500 });
+
         if (!key) return new Response("এই মোডের এপিআই কী সেট করা নেই। অ্যাডমিন প্যানেলে কী বসান।", { status: 500 });
 
         // Merge Prompts properly so BASE_PROMPT is NEVER lost
