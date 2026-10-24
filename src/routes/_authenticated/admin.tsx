@@ -34,8 +34,6 @@ function AdminPage() {
   const [gKey, setGKey] = useState("");
   const [oKey, setOKey] = useState("");
   const [orKey, setOrKey] = useState("");
-  const [gKey, setGKey] = useState("");
-  const [oKey, setOKey] = useState("");
   const [show, setShow] = useState(false);
   const [pool, setPool] = useState<PoolKey[]>([]);
   const [status, setStatus] = useState("");
