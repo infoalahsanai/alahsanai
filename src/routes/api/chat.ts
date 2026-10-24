@@ -179,8 +179,6 @@ export const Route = createFileRoute("/api/chat")({
         }
         if (!key) return new Response("এই মোডের এপিআই কী সেট করা নেই। অ্যাডমিন প্যানেলে কী বসান।", { status: 500 });
 
-        if (!key) return new Response("এই মোডের এপিআই কী সেট করা নেই। অ্যাডমিন প্যানেলে কী বসান।", { status: 500 });
-
         // Merge Prompts properly so BASE_PROMPT is NEVER lost
         let system = PERSONA + "\n\n" + BASE_PROMPT;
         if (s?.system_prompt?.trim()) {
