@@ -29,8 +29,11 @@ type S = {
 
 function AdminPage() {
   const { user } = Route.useRouteContext();
-  const admin = useIsAdmin(user.id);
+  const admin = useIsAdmin(user.id);   
   const [s, setS] = useState<S | null>(null);
+  const [gKey, setGKey] = useState("");
+  const [oKey, setOKey] = useState("");
+  const [orKey, setOrKey] = useState("");
   const [gKey, setGKey] = useState("");
   const [oKey, setOKey] = useState("");
   const [show, setShow] = useState(false);
@@ -44,10 +47,13 @@ function AdminPage() {
       setStatus(error ? `সেটিংস আনা যায়নি: ${error.message}` : "");
       setS({ admin_note: "", system_prompt: "", provider: "lovable", model: "", hourly_limit: 30, daily_limit: 200, reasoning_effort: "low", welcome_title: "", welcome_subtitle: "", suggestions: "", url_reader: true, site_builder: true, chat_enabled: true });
     });
-    supabase.from("ai_keys").select("*").eq("id", 1).maybeSingle().then(({ data }) => {
+        supabase.from("ai_keys").select("*").eq("id", 1).maybeSingle().then(({ data }) => {
       if (data) {
-        setGKey(data.google_key); setOKey(data.openai_key);
-        setPool(Array.isArray(data.key_pool) ? (data.key_pool as unknown as PoolKey[]) : []);
+        setGKey(data.google_key || ""); setOKey(data.openai_key || "");
+        const rawPool = Array.isArray(data.key_pool) ? (data.key_pool as unknown as PoolKey[]) : [];
+        const orEntry = rawPool.find((p: any) => p?.provider === "openrouter");
+        if (orEntry?.key) setOrKey(orEntry.key);
+        setPool(rawPool.filter((p: any) => p?.provider !== "openrouter"));
       }
     });
   }, [admin]);
@@ -78,11 +84,16 @@ function AdminPage() {
       daily_limit: Math.max(1, s.daily_limit || 1),
       updated_at: new Date().toISOString(),
     }, { onConflict: "id" });
-    const seen = new Set([gKey.trim(), oKey.trim()].filter(Boolean));
+        const seen = new Set([gKey.trim(), oKey.trim(), orKey.trim()].filter(Boolean));
     const cleanPool = pool.filter((p) => p.key.trim()).map((p) => ({ ...p, name: p.name.trim() || p.provider, key: p.key.trim() }))
       .filter((p) => (seen.has(p.key) ? false : (seen.add(p.key), true))).slice(0, 2);
+    const toSavePool = [...cleanPool];
+    if (orKey.trim()) {
+      toSavePool.push({ name: "OpenRouter", provider: "openrouter" as any, key: orKey.trim(), active: true });
+    }
     setPool(cleanPool);
-    const r2 = await supabase.from("ai_keys").upsert({ id: 1, google_key: gKey.trim(), openai_key: oKey.trim(), key_pool: cleanPool, updated_at: new Date().toISOString() }, { onConflict: "id" });
+    const r2 = await supabase.from("ai_keys").upsert({ id: 1, google_key: gKey.trim(), openai_key: oKey.trim(), key_pool: toSavePool, updated_at: new Date().toISOString() }, { onConflict: "id" });
+
     const err = r1.error || r2.error;
     setStatus(err ? `ত্রুটি: ${err.message}` : "✓ সংরক্ষিত হয়েছে। এআই এখন থেকেই নতুন সেটিং অনুযায়ী চলবে।");
   };
@@ -159,11 +170,13 @@ function AdminPage() {
               {show ? <EyeOff size={15} /> : <Eye size={15} />} {show ? "লুকান" : "দেখুন"}
             </button>
           </div>
-          <p className={hint}>শুধু অ্যাডমিন দেখতে পান। Google, Open Router বা Groq মোড বেছে নিলে এই কী ব্যবহার হবে।</p>
+                    <p className={hint}>শুধু অ্যাডমিন দেখতে পান। আপনি যে মোড ব্যবহার করবেন তার এপিআই কী এখানে বসিয়ে সংরক্ষণ করবেন।</p>
           <label className="mt-4 block text-sm text-muted-foreground">Google Gemini API Key</label>
           <input type={show ? "text" : "password"} value={gKey} onChange={(e) => setGKey(e.target.value)} className={`${input} mt-1`} placeholder="AQ…" />
-                    <label className="mt-3 block text-sm text-muted-foreground">Groq API Key </label>
+          <label className="mt-3 block text-sm text-muted-foreground">Groq API Key</label>
           <input type={show ? "text" : "password"} value={oKey} onChange={(e) => setOKey(e.target.value)} className={`${input} mt-1`} placeholder="gsk_…" />
+          <label className="mt-3 block text-sm text-muted-foreground">OpenRouter API Key</label>
+          <input type={show ? "text" : "password"} value={orKey} onChange={(e) => setOrKey(e.target.value)} className={`${input} mt-1`} placeholder="sk-or-v1-…" />
         </section>
 
         <section className={card}>
