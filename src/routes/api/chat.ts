@@ -168,9 +168,9 @@ export const Route = createFileRoute("/api/chat")({
         if (provider === "google") {
           url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
           key = keys?.google_key?.trim() || process.env["GOOGLE_API_KEY"];
-        } else if (provider === "openai") {
-          url = "https://api.openai.com/v1/chat/completions";
-          key = keys?.openai_key?.trim() || process.env["OPENAI_API_KEY"];
+                } else if (provider === "openai") {
+          url = "https://api.groq.com/openai/v1/chat/completions";
+          key = keys?.openai_key?.trim() || process.env["GROQ_API_KEY"] || process.env["OPENAI_API_KEY"];
         }
         if (!key) return new Response("এই মোডের এপিআই কী সেট করা নেই। অ্যাডমিন প্যানেলে কী বসান।", { status: 500 });
 
