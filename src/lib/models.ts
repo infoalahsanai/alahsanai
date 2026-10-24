@@ -18,14 +18,15 @@ export const GOOGLE_MODELS = [
 ];
 
 export const OPENAI_MODELS = [
-  { id: "gpt-5.5", label: "GPT-5.5" },
-  { id: "gpt-4.1", label: "GPT-4.1" },
-  { id: "gpt-4o", label: "GPT-4o" },
+  { id: "openai/gpt-oss-120b", label: "GPT OSS 120B (Groq ফ্ল্যাগশিপ, সর্বোচ্চ বুদ্ধিমান)" },
+  { id: "openai/gpt-oss-20b", label: "GPT OSS 20B (সুপার ফাস্ট ১০০০ t/s, ১-২ সেকেন্ড)" },
+  { id: "qwen/qwen3.8-27b", label: "Qwen 3.8 27B (শক্তিশালী বহুভাষিক ও যুক্তি)" },
+  { id: "minimaxai/minimax-m2.7", label: "MiniMax M2.7 (১৯৬k বিশাল মেমোরি)" },
 ];
 
 export const DEFAULT_MODELS: Record<Provider, string> = {
   lovable: "openai/gpt-6-astra",
   google: "gemini-3.8-flash",
-  openai: "gpt-5.5",
+  openai: "openai/gpt-oss-120b",
 };
 
