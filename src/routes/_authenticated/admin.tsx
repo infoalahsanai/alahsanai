@@ -43,7 +43,7 @@ function AdminPage() {
     supabase.from("ai_settings").select("*").eq("id", 1).maybeSingle().then(({ data, error }) => {
       if (data) return setS(data as unknown as S);
       setStatus(error ? `সেটিংস আনা যায়নি: ${error.message}` : "");
-      setS({ admin_note: "", system_prompt: "", provider: "lovable", model: "", hourly_limit: 30, daily_limit: 200, reasoning_effort: "low", welcome_title: "", welcome_subtitle: "", suggestions: "", url_reader: true, site_builder: true, chat_enabled: true });
+      setS({ admin_note: "", system_prompt: "", provider: "openrouter", model: "", hourly_limit: 30, daily_limit: 200, reasoning_effort: "low", welcome_title: "", welcome_subtitle: "", suggestions: "", url_reader: true, site_builder: true, chat_enabled: true });
     });
         supabase.from("ai_keys").select("*").eq("id", 1).maybeSingle().then(({ data }) => {
       if (data) {
