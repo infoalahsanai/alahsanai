@@ -131,7 +131,7 @@ function AdminPage() {
         <section className={card}>
           <h2 className={h2}>৩. এআই মোড, মডেল ও চিন্তার গভীরতা</h2>
           <div className="mt-4 grid grid-cols-3 gap-2">
-            {([["lovable", "বিল্ট-ইন"], ["google", "Google Gemini"], ["openai", "OpenAI"]] as const).map(([p, l]) => (
+                        {([["lovable", "বিল্ট-ইন"], ["google", "Google Gemini"], ["openai", "Groq (সুপার ফাস্ট)"]] as const).map(([p, l]) => (
               <button key={p} onClick={() => setS({ ...s, provider: p, model: listFor(p)[0]?.id ?? "" })}
                 className={`rounded-lg border px-3 py-3 text-sm ${s.provider === p ? "border-primary bg-primary/15 text-primary" : "border-border"}`}>{l}</button>
             ))}
