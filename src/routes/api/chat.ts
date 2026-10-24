@@ -162,10 +162,10 @@ export const Route = createFileRoute("/api/chat")({
           ? (provider === "google" ? "gemini-3-flash-preview" : provider === "lovable" ? "google/gemini-3-flash-preview" : baseModel)
           : baseModel;
 
-        // API keys
-        let url = "https://ai.gateway.lovable.dev/v1/chat/completions";
-        let key = process.env["LOVABLE_API_KEY"];
-        if (provider === "google") {
+         // API keys
+        let url = "https://openrouter.ai/api/v1/chat/completions";
+        let key = process.env["OPENROUTER_API_KEY"] || keys?.openai_key?.trim();
+          if (provider === "google") {
           url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
           key = keys?.google_key?.trim() || process.env["GOOGLE_API_KEY"];
                 } else if (provider === "openai") {
