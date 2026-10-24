@@ -161,9 +161,9 @@ function AdminPage() {
           </div>
           <p className={hint}>শুধু অ্যাডমিন দেখতে পান। Google বা OpenAI মোড বেছে নিলে এই কী ব্যবহার হবে। বিল্ট-ইন মোডে কী লাগে না।</p>
           <label className="mt-4 block text-sm text-muted-foreground">Google Gemini API Key</label>
-          <input type={show ? "text" : "password"} value={gKey} onChange={(e) => setGKey(e.target.value)} className={`${input} mt-1`} placeholder="AIza…" />
-          <label className="mt-3 block text-sm text-muted-foreground">OpenAI API Key</label>
-          <input type={show ? "text" : "password"} value={oKey} onChange={(e) => setOKey(e.target.value)} className={`${input} mt-1`} placeholder="sk-…" />
+          <input type={show ? "text" : "password"} value={gKey} onChange={(e) => setGKey(e.target.value)} className={`${input} mt-1`} placeholder="AQ…" />
+                    <label className="mt-3 block text-sm text-muted-foreground">Groq API Key (console.groq.com থেকে ফ্রি)</label>
+          <input type={show ? "text" : "password"} value={oKey} onChange={(e) => setOKey(e.target.value)} className={`${input} mt-1`} placeholder="gsk_…" />
         </section>
 
         <section className={card}>
