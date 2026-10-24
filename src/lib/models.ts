@@ -1,4 +1,4 @@
-export type Provider = "lovable" | "google" | "openai";
+export type Provider = "openrouter" | "google" | "groq";
 
 export const LOVABLE_MODELS = [
   { id: "openrouter/free", label: "OpenRouter Free (সম্পূর্ণ ফ্রি — অটো রাউটার)" },
@@ -24,8 +24,8 @@ export const OPENAI_MODELS = [
 ];
 
 export const DEFAULT_MODELS: Record<Provider, string> = {
-  lovable: "openai/gpt-6-astra",
+  openrouter: "openrouter/free",
   google: "gemini-3.8-flash",
-  openai: "openai/gpt-oss-120b",
+  groq: "openai/gpt-oss-120b",
 };
 
