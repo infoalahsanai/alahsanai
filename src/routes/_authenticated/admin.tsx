@@ -143,7 +143,7 @@ function AdminPage() {
           </select>
           <label className="mt-2 block text-xs text-muted-foreground">অথবা নিজে মডেলের নাম লিখুন</label>
           <input value={s.model} onChange={(e) => set("model", e.target.value)} className={`${input} mt-1 text-sm`} />
-          <label className="mt-4 block text-sm text-muted-foreground">চিন্তার গভীরতা (বিল্ট-ইন GPT-6 Astra)</label>
+          <label className="mt-4 block text-sm text-muted-foreground">চিন্তার গভীরতা</label>
           <select value={s.reasoning_effort} onChange={(e) => set("reasoning_effort", e.target.value)} className={`${input} mt-1`}>
             <option value="low">কম — দ্রুত উত্তর</option>
             <option value="medium">মাঝারি — ভারসাম্য</option>
@@ -159,10 +159,10 @@ function AdminPage() {
               {show ? <EyeOff size={15} /> : <Eye size={15} />} {show ? "লুকান" : "দেখুন"}
             </button>
           </div>
-          <p className={hint}>শুধু অ্যাডমিন দেখতে পান। Google বা OpenAI মোড বেছে নিলে এই কী ব্যবহার হবে। বিল্ট-ইন মোডে কী লাগে না।</p>
+          <p className={hint}>শুধু অ্যাডমিন দেখতে পান। Google, Open Router বা Groq মোড বেছে নিলে এই কী ব্যবহার হবে।</p>
           <label className="mt-4 block text-sm text-muted-foreground">Google Gemini API Key</label>
           <input type={show ? "text" : "password"} value={gKey} onChange={(e) => setGKey(e.target.value)} className={`${input} mt-1`} placeholder="AQ…" />
-                    <label className="mt-3 block text-sm text-muted-foreground">Groq API Key (console.groq.com থেকে ফ্রি)</label>
+                    <label className="mt-3 block text-sm text-muted-foreground">Groq API Key </label>
           <input type={show ? "text" : "password"} value={oKey} onChange={(e) => setOKey(e.target.value)} className={`${input} mt-1`} placeholder="gsk_…" />
         </section>
 
