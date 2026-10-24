@@ -70,7 +70,7 @@ function AdminPage() {
   if (!s) return <div className="min-h-screen bg-background p-8 text-muted-foreground">লোড হচ্ছে…</div>;
 
   const set = <K extends keyof S>(k: K, v: S[K]) => setS({ ...s, [k]: v });
-  const listFor = (p: Provider) => (p === "google" ? GOOGLE_MODELS : p === "openai" ? OPENAI_MODELS : LOVABLE_MODELS);
+  const listFor = (p: Provider) => (p === "google" ? GOOGLE_MODELS : p === "groq" ? OPENAI_MODELS : LOVABLE_MODELS);
   const models = listFor(s.provider);
 
   const save = async () => {
@@ -140,7 +140,7 @@ function AdminPage() {
         <section className={card}>
           <h2 className={h2}>৩. এআই মোড, মডেল ও চিন্তার গভীরতা</h2>
           <div className="mt-4 grid grid-cols-3 gap-2">
-                        {([["openrouter", "Open Router"], ["google", "Google Gemini"], ["gorq", "Groq"]] as const).map(([p, l]) => (
+                        {([["openrouter", "Open Router"], ["google", "Google Gemini"], ["groq", "Groq"]] as const).map(([p, l]) => (
               <button key={p} onClick={() => setS({ ...s, provider: p, model: listFor(p)[0]?.id ?? "" })}
                 className={`rounded-lg border px-3 py-3 text-sm ${s.provider === p ? "border-primary bg-primary/15 text-primary" : "border-border"}`}>{l}</button>
             ))}
