@@ -172,7 +172,8 @@ export const Route = createFileRoute("/api/chat")({
         if (provider === "google") {
           url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
           key = keys?.google_key?.trim() || process.env["GOOGLE_API_KEY"];
-        } else if (provider === "openai") {
+          } else if (provider === "groq") {
+          
           url = "https://api.groq.com/openai/v1/chat/completions";
           key = keys?.openai_key?.trim() || process.env["GROQ_API_KEY"] || process.env["OPENAI_API_KEY"];
         }
@@ -187,6 +188,17 @@ export const Route = createFileRoute("/api/chat")({
         }
         if (s?.site_builder === false) system += "\n\nএখন ওয়েবসাইট তৈরির সুবিধা বন্ধ আছে।";
         
+                // ৩টি প্রোভাইডারের জন্যই চিন্তার গভীরতা বাস্তবায়ন
+        if (s?.reasoning_effort) {
+          const depthRules: Record<string, string> = {
+            low: "\n\n=== চিন্তার গভীরতা: কম (দ্রুততম উত্তর) ===\nকোনো অপ্রয়োজনীয় ভূমিকা বা দীর্ঘ ব্যাখ্যা ছাড়া সরাসরি মূল উত্তর ও কার্যকর সমাধান সংক্ষেপে দাও।",
+            medium: "\n\n=== চিন্তার গভীরতা: মাঝারি (ভারসাম্যপূর্ণ) ===\nপ্রয়োজনীয় যুক্তি ও প্রাসঙ্গিক কারণসহ গোছানো ও ভারসাম্যপূর্ণ উত্তর দাও।",
+            high: "\n\n=== চিন্তার গভীরতা: বেশি (গভীর বিশ্লেষণ) ===\nধাপে ধাপে গভীরভাবে চিন্তা করো, প্রতিটি বিষয় বিশদভাবে বিশ্লেষণ করে পূর্ণাঙ্গ সমাধান দাও।",
+            xhigh: "\n\n=== চিন্তার গভীরতা: সর্বোচ্চ (সর্বাধিক পাণ্ডিত্যপূর্ণ) ===\nপুঙ্খানুপুঙ্খভাবে চিন্তা করো, সর্বোচ্চ মানের খুঁটিনাটি ও সম্পূর্ণ ত্রুটিহীন কোড/উত্তর দাও।"
+          };
+          system += depthRules[s.reasoning_effort] || "";
+        }
+
         const textMsgs = parsed.data.messages.map((m) => ({ role: m.role, content: m.content }));
         if (s?.url_reader !== false) {
           const last = textMsgs[textMsgs.length - 1];
@@ -279,11 +291,10 @@ export const Route = createFileRoute("/api/chat")({
           messages: [{ role: "system", content: system }, ...msgs],
         };
 
-        if (provider === "lovable" && model.startsWith("openai/gpt-5.6")) body["reasoning_effort"] = "none";
-        if (provider === "lovable" && model === "openai/gpt-6-astra") {
-          // দ্রুত প্রথম সাড়ার জন্য ডিফল্ট low
-          const eff = s?.reasoning_effort ?? "low";
-          body["reasoning_effort"] = ["low", "medium", "high", "xhigh"].includes(eff) ? eff : "low";
+                // OpenRouter ও অন্যান্য সমর্থিত রিজনিং মডেলের জন্য এপিআই প্যারামিটার
+        const eff = s?.reasoning_effort || "low";
+        if (provider === "openrouter") {
+          body["reasoning"] = { effort: eff === "xhigh" ? "high" : eff };
         }
 
         type PoolKey = { name?: string; provider?: string; key?: string; base_url?: string; model?: string; active?: boolean };
