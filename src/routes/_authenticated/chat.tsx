@@ -28,7 +28,7 @@ const WAIT_HINTS = [
   { label: "উত্তরের কাঠামো তৈরি হচ্ছে", sub: "বিশদ ও সাবলীল উপস্থাপনা সাজানো হচ্ছে..." },
   { label: "চূড়ান্ত রূপ দেওয়া হচ্ছে", sub: "একটুখানি অপেক্ষা করুন..." },
 ];
-function WorkflowStepper({ stages, current }: { stages: string[]; current: number }) {
+function WorkflowStepper({ stages, current, tokenInfo }: { stages: string[]; current: number; tokenInfo?: { used?: number; remaining?: string } }) {
   const finished = current >= stages.length;
   const [sec, setSec] = useState(0);
 
@@ -48,19 +48,24 @@ function WorkflowStepper({ stages, current }: { stages: string[]; current: numbe
 
   const label = rawInfo?.label || "আপনার প্রশ্ন বিশ্লেষণ করা হচ্ছে";
   const cleanLabel = label.replace(/\.+$/, "").trim();
-
   const bnNum = (n: number) => String(n).replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[Number(d)]!);
 
-    return (
-          <div className="not-prose my-3.5 py-1 pl-1 animate-in fade-in duration-300">
-                <div className="inline-block text-base font-semibold live-status-shimmer tracking-normal">
-                        {cleanLabel}
-                              </div>
-                                    <div className="mt-1.5 text-sm text-muted-foreground tabular-nums">
-                                            {bnNum(sec)} সেকেন্ড
-                                                  </div>
-                                                      </div>
-                                                        );
+  return (
+    <div className="not-prose my-3.5 py-1 pl-1 animate-in fade-in duration-300">
+      <div className="inline-block text-base font-semibold live-status-shimmer tracking-normal">
+        {cleanLabel}
+      </div>
+      <div className="mt-1.5 text-sm text-muted-foreground tabular-nums flex items-center gap-2">
+        <span>⏱️ {bnNum(sec)} সেকেন্ড</span>
+        {tokenInfo?.remaining && (
+          <span>• ⚡ অবশিষ্ট সীমা: {bnNum(Number(tokenInfo.remaining))} টোকেন</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
     
 }
 
@@ -331,6 +336,7 @@ function ChatPage() {
     });
   };
   const [loading, setLoading] = useState(false);
+   const [tokenInfo, setTokenInfo] = useState<{ used?: number; remaining?: string } | null>(null);
   const [flow, setFlow] = useState<{ stages: string[]; current: number } | null>(null);
   const pushStage = (st: string, finish = false) => setFlow((f) => { const stages = f ? (f.stages.includes(st) ? f.stages : [...f.stages, st]) : [st]; return { stages, current: finish ? stages.length : stages.indexOf(st) }; });
   const [voiceOut, setVoiceOut] = useState(false);
@@ -450,6 +456,7 @@ function ChatPage() {
         if (!d || d === "[DONE]") return;
         try {
           const j = JSON.parse(d);
+          if (j.tokenInfo) { setTokenInfo(j.tokenInfo); return; } 
           if (j.stage) return pushStage(j.stage);
           if (j.error) { showErr(String(j.error)); return; }
           const delta = j.choices?.[0]?.delta?.content;
@@ -671,8 +678,8 @@ function ChatPage() {
                     </>
                   ) : (
                     <>
-                      {i === msgs.length - 1 && flow && <WorkflowStepper stages={flow.stages} current={flow.current} />}
-                      {m.content ? (() => {
+                        {i === msgs.length - 1 && flow && <WorkflowStepper stages={flow.stages} current={flow.current} tokenInfo={tokenInfo || undefined} />}
+                        {m.content ? (() => {
                         const { body, followups } = splitFollowups(stripEmoji(m.content));
                         const streamingNow = loading && i === msgs.length - 1;
                         return (
