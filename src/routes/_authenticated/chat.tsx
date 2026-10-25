@@ -65,10 +65,6 @@ function WorkflowStepper({ stages, current, tokenInfo }: { stages: string[]; cur
   );
 }
 
-
-    
-}
-
 // উত্তরের শেষে [[প্রশ্ন: ...]] আকারে ফলো-আপ প্রশ্ন থাকে — আলাদা করা
 function splitFollowups(t: string): { body: string; followups: string[] } {
   const followups: string[] = [];
