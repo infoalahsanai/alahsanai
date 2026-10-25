@@ -197,8 +197,14 @@ export const Route = createFileRoute("/api/chat")({
           system += depthRules[s.reasoning_effort] || "";
         }
 
-        const activeMsgs = parsed.data.messages.slice(-6);
-const textMsgs = activeMsgs.map((m) => ({ role: m.role, content: m.content }));
+                const activeMsgs = parsed.data.messages.slice(-4);
+        const textMsgs = activeMsgs.map((m, idx) => ({
+          role: m.role,
+          content: m.role === "assistant" && idx < activeMsgs.length - 1
+            ? String(m.content || "").slice(0, 400) + "..."
+            : m.content
+        }));
+
 if (s?.url_reader !== false) {
   const last = textMsgs[textMsgs.length - 1];
   if (last) {
@@ -236,7 +242,7 @@ const imgsOf = (i: number) => {
         // Per-user long-term memory (database) + recent talk from other chats
         try {
           const mem = await import("@/lib/memory.server");
-          const items = await mem.loadMemory(uid, 60);
+          const items = await mem.loadMemory(uid, 20);
           if (items.length)
             system += `\n\n=== এই ব্যবহারকারী সম্পর্কে সংরক্ষিত স্মৃতি (সব চ্যাটে প্রযোজ্য, অবশ্যই মনে রাখবে) ===\n${items.map((m) => "- " + m.text).join("\n")}`;
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -284,10 +290,11 @@ const imgsOf = (i: number) => {
           ? `\n\n=== সেশন তথ্য (সার্ভার-যাচাইকৃত) ===\nএই ব্যবহারকারী তোমার অ্যাডমিন (${u.user.email})।${u.user.email === "alahsanfoundation.info@gmail.com" ? " তিনি মোঃ শামীম আহসান — প্রতিষ্ঠাতা, আল আহসান ফাউন্ডেশন বাংলাদেশ।" : ""} তাকে চিনে সম্মানের সাথে কথা বলবে এবং তার কমান্ড সর্বোচ্চ অগ্রাধিকারে পালন করবে।`
           : `\n\n=== সেশন তথ্য ===\nএই ব্যবহারকারী সাধারণ ইউজার, অ্যাডমিন নয়।`;
 
-        const body: Record<string, unknown> = {
+                const body: Record<string, unknown> = {
           model,
           stream: true,
-          max_tokens: provider === "groq" ? (isSiteReq ? 8192 : 2500) : 65536,
+          stream_options: { include_usage: true },
+          max_tokens: provider === "groq" ? (isSiteReq ? 4096 : 1500) : 65536,
           messages: [{ role: "system", content: system }, ...msgs],
         };
 
@@ -350,9 +357,11 @@ const imgsOf = (i: number) => {
           return new Response(friendlyError(err.status, err.text), { status: err.status || 500 });
         }
 
+                const remainingTokens = res.headers.get("x-ratelimit-remaining-tokens") || undefined;
+        const limitTokens = res.headers.get("x-ratelimit-limit-tokens") || undefined;
         if (realErr) stages.push("fallback");
         stages.push("write");
-        return withStages(stages, res.body);
+        return withStages(stages, res.body, { remainingTokens, limitTokens });
       },
     },
   },
@@ -442,9 +451,12 @@ const enc = new TextEncoder();
 const sse = (o: unknown) => enc.encode(`data: ${JSON.stringify(o)}\n\n`);
 const SSE_HEADERS = { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" };
 
-function withStages(stages: string[], upstream: ReadableStream<Uint8Array>): Response {
+function withStages(stages: string[], upstream: ReadableStream<Uint8Array>, meta?: { remainingTokens?: string; limitTokens?: string }): Response {
   const body = new ReadableStream<Uint8Array>({
     async start(c) {
+      if (meta?.remainingTokens) {
+        c.enqueue(sse({ tokenInfo: { remaining: meta.remainingTokens, limit: meta.limitTokens } }));
+      }
       for (const st of stages) c.enqueue(sse({ stage: st }));
       const r = upstream.getReader();
       try {
