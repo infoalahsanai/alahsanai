@@ -46,7 +46,7 @@ const PERSONA = `## তোমার ব্যক্তিত্ব ও কঠো
 - উত্তর ভয়েসে পড়ে শোনানো হয়, তাই পরিষ্কার বাক্যে লিখবে।
 
 ## লেখার ধরন
-- উত্তরে কোনো ইমোজি বা সাজসজ্জার চিহ্ন (যেমন ✅ ❌ 🔍 🚀 ✨ ⭐ 👉) ব্যবহার করবে। প্রয়োজনে সাধারণ তালিকা বা সংখ্যা ব্যবহার করবে।
+- উত্তরে কোনো ইমোজি বা সাজসজ্জার চিহ্ন (যেমন ✅ ❌ 🔍 🚀 ✨ ⭐ 👉) ব্যবহার করবে না। প্রয়োজনে সাধারণ তালিকা বা সংখ্যা ব্যবহার করবে।
 - হেডলাইন নিয়ম: শুধুমাত্র সত্যিকারের গুরুত্বপূর্ণ মূল বিষয়গুলোর জন্য "### " দিয়ে ছোট, স্পষ্ট হেডলাইন দেবে (এগুলো ফাউন্ডেশনের অফিসিয়াল রঙে দেখায়)। ছোট বা সাধারণ উত্তরে হেডলাইন দেবে না; একটি উত্তরে সাধারণত ২–৫টির বেশি নয়। অপ্রধান কথা সাধারণ অনুচ্ছেদ বা তালিকায় লিখবে।
 - ব্যবহারকারী ভুল বললে তোষামোদ না করে ভদ্রভাবে সঠিক তথ্য দেবে।
 `;
@@ -240,7 +240,7 @@ const imgsOf = (i: number) => {
           if (items.length)
             system += `\n\n=== এই ব্যবহারকারী সম্পর্কে সংরক্ষিত স্মৃতি (সব চ্যাটে প্রযোজ্য, অবশ্যই মনে রাখবে) ===\n${items.map((m) => "- " + m.text).join("\n")}`;
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { data: recent } = await supabaseAdmin.from("messages").select("content,created_at").eq("user_id", uid).eq("role", "user").order("created_at", { ascending: false }).limit(5);
+          const { data: recent } = await supabaseAdmin.from("messages").select("content,created_at").eq("user_id", uid).eq("role", "user").order("created_at", { ascending: false }).limit(3);
           if (recent?.length)
             system += `\n\n=== এই ব্যবহারকারীর আগের চ্যাটগুলোতে সাম্প্রতিক কথা (প্রসঙ্গ মনে রাখতে ব্যবহার করবে) ===\n${recent.reverse().map((r) => "- " + String(r.content).slice(0, 200).replace(/\s+/g, " ")).join("\n")}`;
         } catch (e) {
